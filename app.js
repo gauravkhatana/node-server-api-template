@@ -1,7 +1,42 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const cors = require("cors")
+const cors = require("cors");
+const mongoose = require("mongoose");
+
+mongoose
+  .connect(
+    "mongodb+srv://kumartech0102:node0102@cluster.scdz9q0.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster"
+  )
+  .then((_) => {
+    console.log("connection successful");
+  })
+  .catch((error) => {
+    console.log( error.message);
+  });
+
+// const uri = "mongodb+srv://kumartech0102:Mongodb0102@cluster.scdz9q0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster";
+// // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+// async function run() {
+//   try {
+//     // Connect the client to the server	(optional starting in v4.7)
+//     await client.connect();
+//     // Send a ping to confirm a successful connection
+//     await client.db("test").command({ ping: 1 });
+//     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+//   } finally {
+//     // Ensures that the client will close when you finish/error
+//     await client.close();
+//   }
+// }
+// run().catch(console.dir);
 
 const usersRoutes = require("./api/routes/users");
 const studentsRoutes = require("./api/routes/students");

@@ -1,44 +1,87 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
+const User = require("../../models/users");
 
 router.get("/", (req, resp) => {
-  resp.status(200).json({
-    message: "User fetched successfully",
-  });
+  User.find()
+    .then((result) => {
+      console.log(result);
+      resp.status(200).json({
+        message: "User fetched successfully",
+        users: result,
+      });
+    })
+    .catch((err) => resp.status(500).json({ error: err.message }));
 });
+
 router.post("/", (req, resp) => {
-  user = {
+  const user = new User({
+    _id: new mongoose.Types.ObjectId(),
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     number: req.body.number,
     email: req.body.email,
     password: req.body.password,
-  };
-  resp.status(201).json({
-    message: "User created successfully",
-    user: user,
   });
+
+  user
+    .save()
+    .then((result) => {
+      resp.status(201).json({
+        message: "User created successfully",
+        createdUser: result,
+      });
+    })
+    .catch((err) => resp.status(500).json({ error: err.message }));
 });
+
 router.get("/:id", (req, resp) => {
   const id = req.params.id;
-  resp.status(200).json({
-    message: `User with id : ${id} fetched successfullt`,
-    id: id,
-  });
+  User.findById(id)
+    .then((result) => {
+      if (result != null) {
+        resp.status(200).json({
+          message: `User with id : ${id} fetched successfullt`,
+          user: result,
+        });
+      } else {
+        resp.status(500).json({
+          message: `No user present with this id`,
+        });
+      }
+    })
+    .catch((err) => resp.status(500).json({ error: err.message }));
 });
+
+router.patch("/:id", (req, resp) => {
+  const id = req.params.id;
+  User.findById(id)
+    .then((result) => {
+      if (result != null) {
+        User.update({ _id: id }, { $set: req.body });
+      } else {
+        resp.status(500).json({
+          message: `No user present with this id`,
+        });
+      }
+    })
+    .catch((err) => resp.status(500).json({ error: err.message }));
+});
+
 router.delete("/:id", (req, resp) => {
   const id = req.params.id;
-  resp.status(201).json({
-    message: `User with id  ${id} deleted successfully`,
-    id: id,
-  });
-});
-router.put("/:id", (req, resp) => {
-  const id = req.params.id;
-  resp.status(200).json({
-    message: `User with id: ${id} updated successfully`,
-    id: id,
-  });
+  User.findById(id)
+    .then((result) => {
+      if (result != null) {
+        User.remove({ _id: id });
+      } else {
+        resp.status(500).json({
+          message: `No user present with this id`,
+        });
+      }
+    })
+    .catch((err) => resp.status(500).json({ error: err.message }));
 });
 
 module.exports = router;
