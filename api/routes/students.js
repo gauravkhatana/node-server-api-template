@@ -56,17 +56,28 @@ router.get("/:id", (req, resp) => {
 
 router.patch("/:id", (req, resp) => {
   const id = req.params.id;
+  console.log(id);
   Student.findById(id)
     .then((result) => {
       if (result != null) {
-        Student.update({ _id: id }, { $set: req.body });
+        return Student.updateOne({ _id: id }, { $set: req.body })
+          .then((result) => {
+            resp.status(200).json({ message: "updated successfully" });
+          })
+          .catch((err) => {
+            console.log(err);
+            return resp.status(500).json({ error: err.message });
+          });
       } else {
         resp.status(500).json({
           message: `No student present with this id`,
         });
       }
     })
-    .catch((err) => resp.status(500).json({ error: err.message }));
+    .catch((err) => {
+      console.log(err);
+      return resp.status(500).json({ error: err.message });
+    });
 });
 
 router.delete("/:id", (req, resp) => {
@@ -74,7 +85,17 @@ router.delete("/:id", (req, resp) => {
   Student.findById(id)
     .then((result) => {
       if (result != null) {
-        Student.remove({ _id: id });
+        return Student.deleteOne({ _id: id })
+          .then((result) => {
+            console.log("deleted", result);
+            return resp
+              .status(200)
+              .json({ message: "student deleted successfully" });
+          })
+          .catch((err) => {
+            console.log(err);
+            return resp.status(500).json({ error: err.message });
+          });
       } else {
         resp.status(500).json({
           message: `No student present with this id`,
